@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>교구 관리 보고 도우미</title>
+    <title>교구 충전 보고</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -160,7 +160,7 @@
     function getToday() {
         const d = new Date();
         const week = ['일', '월', '화', '수', '목', '금', '토'];
-        return `[${d.getMonth()+1}월 ${d.getDate()}일 ${week[d.getDay()]}요일 보고]`;
+        return `[${d.getMonth()+1}월 ${d.getDate()}일 ${week[d.getDay()]}요일 충전 보고]`;
     }
     document.getElementById('dateHeader').innerText = getToday();
 
@@ -200,7 +200,7 @@
         });
 
         if(hasCharge) {
-            report += "■ 충전 현황\n" + chargeLines + "충전 중입니다.";
+            report += "■ 충전 현황\n" + chargeLines";
         } else {
             report += "현재 충전 중인 교구 없습니다.";
         }
