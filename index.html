@@ -55,11 +55,10 @@
         }
         input[type="number"] { width: 65px; text-align: center; }
 
-        /* 기타 기기 추가 스타일 */
         .etc-item { display: flex; gap: 8px; margin-top: 8px; }
         .etc-name { flex: 2; }
         .etc-qty { flex: 1; }
-        .btn-del { background: #fee2e2; color: var(--danger); border: none; width: 40px; border-radius: 8px; font-weight: bold; }
+        .btn-del { background: #fee2e2; color: var(--danger); border: none; width: 40px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
         .btn-add {
             width: 100%;
@@ -82,9 +81,9 @@
             font-size: 0.95rem;
             box-sizing: border-box;
             background: #fcfcfc;
+            resize: none;
         }
 
-        /* 체크박스 스타일 */
         .power-option {
             display: flex;
             align-items: center;
@@ -95,14 +94,13 @@
             border: 1px solid #fed7d7;
             margin-top: 10px;
         }
-        .power-option input { width: 22px; height: 22px; accent-color: var(--danger); }
+        .power-option input { width: 22px; height: 22px; accent-color: var(--danger); cursor: pointer; }
         .power-option label { color: var(--danger); font-weight: bold; cursor: pointer; }
 
-        /* 하단 버튼 */
         .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        button.main { background: var(--primary); color: white; padding: 18px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold; }
-        button.sub { background: #64748b; color: white; padding: 14px; border: none; border-radius: 12px; font-weight: bold; }
-        button.reset { background: #f1f5f9; color: #94a3b8; padding: 10px; border: none; border-radius: 8px; font-size: 0.85rem; }
+        button.main { background: var(--primary); color: white; padding: 18px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        button.sub { background: #64748b; color: white; padding: 14px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        button.reset { background: #f1f5f9; color: #94a3b8; padding: 10px; border: none; border-radius: 8px; font-size: 0.85rem; cursor: pointer; }
 
         #previewArea {
             background: #1e293b;
@@ -176,11 +174,11 @@
     }
 
     function buildReport() {
-        let report = getToday() + "\n";
+        // [수정] 날짜 뒤에 \n을 하나 더 추가하여 제목과 본문 사이를 띄움
+        let report = getToday() + "\n\n"; 
         let chargeLines = "";
         let hasCharge = false;
 
-        // 고정 기기
         document.querySelectorAll('.fix-qty').forEach(el => {
             let v = parseInt(el.value);
             if(v > 0) {
@@ -189,7 +187,6 @@
             }
         });
 
-        // 기타 기기
         document.querySelectorAll('.etc-item').forEach(item => {
             const name = item.querySelector('.etc-name').value.trim();
             const qty = parseInt(item.querySelector('.etc-qty').value);
@@ -200,18 +197,16 @@
         });
 
         if(hasCharge) {
-            report += "■ 충전 현황\n" + chargeLines";
+            report += "■ 충전 현황\n" + chargeLines;
         } else {
-            report += "현재 충전 중인 교구 없습니다.";
+            report += "현재 충전 중인 교구 없습니다.\n";
         }
 
-        // 배정 현황 (한 줄 띄우고 시작)
         const assign = document.getElementById('assignText').value.trim();
         if(assign) {
-            report += "\n\n■ 배정\n- " + assign;
+            report += "\n■ 배정\n- " + assign;
         }
 
-        // 전원 확인 (가장 마지막, 한 줄 띄우고 시작)
         if(document.getElementById('powerOff').checked) {
             report += "\n\n※ 교구장 내 멀티탭 전원을 모두 OFF 했습니다.";
         }
@@ -219,15 +214,20 @@
         return report;
     }
 
-    function copyText() {
+    async function copyText() {
         const text = buildReport();
-        const t = document.createElement("textarea");
-        document.body.appendChild(t);
-        t.value = text;
-        t.select();
-        document.execCommand('copy');
-        document.body.removeChild(t);
-        alert("보고 문구가 복사되었습니다!");
+        try {
+            await navigator.clipboard.writeText(text);
+            alert("보고 문구가 복사되었습니다!");
+        } catch (err) {
+            const t = document.createElement("textarea");
+            document.body.appendChild(t);
+            t.value = text;
+            t.select();
+            document.execCommand('copy');
+            document.body.removeChild(t);
+            alert("보고 문구가 복사되었습니다!");
+        }
     }
 
     function togglePreview() {
@@ -248,6 +248,7 @@
             document.getElementById('assignText').value = "";
             document.getElementById('powerOff').checked = false;
             document.getElementById('previewArea').style.display = 'none';
+            window.scrollTo(0, 0);
         }
     }
 </script>
